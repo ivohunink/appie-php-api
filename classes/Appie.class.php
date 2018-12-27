@@ -3,8 +3,9 @@
 * Appie is a class enabling you to access the unofficial Appie (Albert Heijn) API
 *
 * Example usage:
-* Appie::Instance()->login("email@email.com","password");
-* Appie::Instance()->addProduct("Icecream");
+* $appie = new Appie();
+* $appie->login("email@email.com","password");
+* $appie->addProduct("Icecream");
 *
 * @author   Ivo Hunink <hunink.ivo@gmail.com>
 * @version  $Revision: 1.0 $
@@ -28,12 +29,16 @@ class Appie {
 	 * function login
 	 *
 	 * Logs into the Appie API. 
-	 * @param (string) $username the username
+	 * @param (string) $username the user's email address which serves as username
 	 * @param (string) $password the password
 	 * 
 	 * @return Returns (True) when logged in successfully, or (False) when the login attempt was unsuccessful.
 	 */
 	public function login($username, $password){
+		if (!filter_var($username, FILTER_VALIDATE_EMAIL)) {
+			trigger_error('Appie API: Supplied username "'.$username.'" is not a valid email address', E_USER_WARNING);
+		}
+
 		# Prepare and call Appie API
 		$url = "https://www.ah.nl/service/loyalty/rest/tokens";
 		$data = array (
@@ -48,11 +53,10 @@ class Appie {
 		if($response !== false) {
 			if(isset($response->clientId)){
 				$this->isLoggedIn = true;
-					logMessage("Appie API: Logged in successfully using '$username'");	
 			}
 		}
 		if(!$this->isLoggedIn){
-			logMessage("Appie API error: Not logged in using '$username'");	
+			trigger_error("Appie API: Not logged in because an invalid username or password was used", E_USER_WARNING);	
 		}
 		
 		# Return
@@ -69,6 +73,11 @@ class Appie {
 	 * @return Returns (True) when the product was added successfully, or (False) when the product wasn't added.
 	 */
 	public function addProduct ($productName) {
+		if ($productName == "") {
+			trigger_error('Appie API: No product name supplied', E_USER_WARNING);
+			return false;
+		}
+
 		$productAddedSuccessful = false;
 	
 		# Check if user is logged in
@@ -82,11 +91,10 @@ class Appie {
 			if($response !== false) {
 				if(isset($response->id)){
 					$productAddedSuccessful = true;
-					logMessage("Appie API: Product '$productName' added successfully");	
 				}
 			}
 		} else {
-			logMessage("Appie API error: Can't add product while not logged in");	
+			trigger_error("Appie API: Before adding a product, please ensure you're logged into Appie", E_USER_WARNING);	
 		}
 	
 		# Return
@@ -131,11 +139,11 @@ class Appie {
 		# Execute cURL
 		$result = curl_exec($ch);
 		if (curl_error($ch)) {
-			logMessage("cURL error: ".curl_error($ch));
+			trigger_error("Appie API: cURL error " . curl_error($ch), E_USER_WARNING);	
 		} else {
 			$returnValue = json_decode($result);
 			if($returnValue === null) {
-				logMessage("Appie API error: No JSON response");	
+				trigger_error("Appie API: Unvalid JSON respons (the Appie API might have changed - please inform Appie API author)", E_USER_WARNING);	
 			}
 		}
 
