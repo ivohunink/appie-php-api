@@ -143,7 +143,7 @@ class Appie {
 		} else {
 			$returnValue = json_decode($result);
 			if($returnValue === null) {
-				trigger_error("Appie API: Unvalid JSON respons (the Appie API might have changed - please inform Appie API author)", E_USER_WARNING);	
+				trigger_error("Appie API: Unvalid JSON response for '$url'. The unofficial Appie API might have changed. Please inform Ivo Hunink via https://github.com/ivohunink/appie-php-api)", E_USER_WARNING);	
 			}
 		}
 
