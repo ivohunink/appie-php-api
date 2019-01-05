@@ -102,6 +102,37 @@ class Appie {
 	}
 
 	/*
+	 * function getProducts
+	 *
+	 * Stub for getting products.
+	 *
+	 * @return Returns (Array) products when successful, or (False) when products couldnt be retreived.
+	 */
+	public function getProduct () {
+		$products = false;
+	
+		# Check if user is logged in
+		if($this->isLoggedIn){
+			# Prepare and call Appie API
+			$url = "<TODO>"; //TODO
+			$data = "<TODO>"; //TODO
+			$response = $this->callAppieAPI($url, $data);
+
+			# Check response
+			if($response !== false) {
+				if(isset($response->id)){ //TODO
+					$products = true;
+				}
+			}
+		} else {
+			trigger_error("Appie API: Before adding a product, please ensure you're logged into Appie", E_USER_WARNING);	
+		}
+	
+		# Return
+		return $products;
+	}
+
+	/*
 	 * function callAppieAPI
 	 *
 	 * Calls Appie's API.
